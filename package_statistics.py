@@ -19,20 +19,19 @@ def main():
 
     response = requests.get(pkg_filename)
     if response.status_code == 200:
-        binary = response.raw.read()
-        with open("/tmp/contents.gz", "w") as f:
+        binary = response.content
+        with open("/tmp/contents.gz", "wb") as f:
             f.write(binary)
 
     result_map = dict()
 
     with gzip.open("/tmp/contents.gz") as file:
         for line in file:
-            row_content = line.split()
+            row_content = line.decode("utf-8").split()
             file_name = row_content[0]
             pkg_names = row_content[1]
             pkg_names_list = pkg_names.split(",")
             for pkg_name in pkg_names_list:
-                print("file_name, pkg_name", file_name, pkg_name)
                 result_map[pkg_name] = result_map.get(pkg_name, 0) + 1
 
     d_view = [(v, k) for k, v in result_map.items()]
